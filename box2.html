@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <title>tiled box 2</title>
+
+	<script src="babylon.max.js"></script>
+	
+	
+    <style>
+        html, body {
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #renderCanvas {
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="renderCanvas"></canvas>
+    <script>
+if (BABYLON.Engine.isSupported()) {
+    var canvas = document.getElementById("renderCanvas");
+    var engine = new BABYLON.Engine(canvas, true);
+
+
+		
+var createScene = function () {
+	var scene = new BABYLON.Scene(engine);
+
+	var camera = new BABYLON.ArcRotateCamera("Camera", 3 * Math.PI / 2, Math.PI / 2.3, 30, BABYLON.Vector3.Zero(), scene);
+
+	camera.attachControl(canvas, true);
+
+	// Add lights to the scene
+    var light1 = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(1, 1, 0), scene);
+    var light2 = new BABYLON.PointLight("light2", new BABYLON.Vector3(0, 1, -1), scene);
+	
+	var mat = new BABYLON.StandardMaterial("", scene);
+	mat.diffuseTexture = new BABYLON.Texture("https://i.imgur.com/LrucUu6.jpg", scene);
+	
+	var pat = BABYLON.Mesh.FLIP_TILE;
+	var av = BABYLON.Mesh.TOP;
+	var ah = BABYLON.Mesh.LEFT;
+	
+	var options = {
+		sideOrientation: BABYLON.Mesh.DOUBLESIDE,
+		pattern: pat,
+		alignVertical: av,
+		alignHorizontal: ah,
+		width: 6.9,
+		height: 3.9,
+		depth: 2.8,
+		tileSize: 1,
+		tileWidth:3
+	}
+	
+	var mesh = BABYLON.MeshBuilder.CreateTiledBox("", options, scene);
+	mesh.material = mat;
+	
+	
+	return scene;
+}
+
+
+var scene = createScene();
+
+engine.runRenderLoop(function () {
+  scene.render();
+
+});
+
+window.addEventListener("resize", function () {
+    engine.resize();
+});
+        }
+    </script>
+</body>
+</html>
