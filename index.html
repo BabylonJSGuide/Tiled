@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <title>new plane 7</title>
+
+	<script src="babylon.max.js"></script>
+	<script src="babylon.gui.max.js"></script>
+	
+	
+    <style>
+        html, body {
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #renderCanvas {
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="renderCanvas"></canvas>
+    <script>
+if (BABYLON.Engine.isSupported()) {
+    var canvas = document.getElementById("renderCanvas");
+    var engine = new BABYLON.Engine(canvas, true);
+
+
+		
+var createScene = function () {
+	var scene = new BABYLON.Scene(engine);
+	
+	var radius = 640 / (2 * Math.PI);
+
+    var camera = new BABYLON.UniversalCamera("UniversalCamera", new BABYLON.Vector3(0, 0, radius * 0.8), scene);
+
+    camera.setTarget(new BABYLON.Vector3(0, 0, radius));
+
+	camera.attachControl(canvas, true);
+
+	// Add lights to the scene
+    var light1 = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), scene);
+    //var light2 = new BABYLON.PointLight("light2", new BABYLON.Vector3(0, 10, -1), scene);
+	
+	var mat = new BABYLON.StandardMaterial("", scene);
+	mat.diffuseTexture = new BABYLON.Texture("https://i.imgur.com/e9uZagd.jpg", scene);
+	
+	var root = new BABYLON.TransformNode("");
+	
+	var pat =  [ BABYLON.Mesh.NO_FLIP,
+		BABYLON.Mesh.FLIP_TILE,
+		BABYLON.Mesh.FLIP_ROW,
+		BABYLON.Mesh.ROTATE_TILE,
+		BABYLON.Mesh.ROTATE_ROW,
+		BABYLON.Mesh.FLIP_N_ROTATE_TILE,
+		BABYLON.Mesh.FLIP_N_ROTATE_ROW
+	];
+	var av = [ BABYLON.Mesh.CENTER,
+		BABYLON.Mesh.TOP,
+		BABYLON.Mesh.BOTTOM
+	];
+	var ah = [ BABYLON.Mesh.CENTER,
+		BABYLON.Mesh.RIGHT,
+		BABYLON.Mesh.LEFT
+	];
+
+	var f = new BABYLON.Vector4(0.5,0, 1, 1); // front image = half the whole image along the width 
+	var b = new BABYLON.Vector4(0,0, 0.5, 1); // back image = second half along the width
+	
+	var angle = 2 * Math.PI / 63;
+	
+	var theta = 0;
+	
+	var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+	for (var i = 0; i < 7; i++) {
+		for (var j = 0; j < 3; j++) {
+			for (var k = 0; k < 3; k++) {
+				var options = {
+					frontUVs: f,
+					backUVs: b,
+					sideOrientation: BABYLON.Mesh.DOUBLESIDE,
+					pattern: pat[i],
+					alignVertical: av[j],
+					alignHorizontal: ah[k],
+					width: 8.9,
+					height: 8.9,
+					tileSize: 1,
+					tileWidth:1
+				}
+			
+				var mesh = BABYLON.MeshBuilder.CreateTiledPlane("", options, scene);
+				mesh.rotation.y = Math.PI / 2 - theta; //front view
+				mesh.rotation.y = 3 * Math.PI / 2 - theta; //back view, comment out for front view
+				mesh.parent = root;
+				mesh.position.x = radius * Math.cos(theta);
+				mesh.position.z = radius * Math.sin(theta);
+				
+				theta += angle;
+				mesh.material = mat;
+				
+
+				var rect1 = new BABYLON.GUI.Rectangle();
+				rect1.width = "100px";
+				rect1.height = "80px";
+				rect1.color = "Orange";
+				rect1.thickness = 2;
+				rect1.background = "green";
+				advancedTexture.addControl(rect1);
+
+				var label = new BABYLON.GUI.TextBlock();
+				label.text = i + "," + j  + "," + k + "\n" +  pat[i] + "," + av[j] + "," + ah[k];
+				rect1.addControl(label);
+
+				rect1.linkWithMesh(mesh);   
+				rect1.linkOffsetY = -280;
+			}
+		}
+	}
+
+	scene.registerAfterRender(function() {
+		root.rotation.y += 0.001; 
+	})
+	return scene;
+}
+
+
+var scene = createScene();
+
+engine.runRenderLoop(function () {
+  scene.render();
+
+});
+
+window.addEventListener("resize", function () {
+    engine.resize();
+});
+        }
+    </script>
+</body>
+</html>
