@@ -54,8 +54,7 @@ var imgLoaded = false;
 var img = new Image();   // Create new img element
 img.addEventListener('load', function() {
 	dynamicTexture = new BABYLON.DynamicTexture("all-sections", 512, scene);
-	context = dynamicTexture.getContext();
-console.log("here", img);        
+	context = dynamicTexture.getContext();      
 	context.drawImage(img, 0, 0, 512, 512);
 	imageData = context.getImageData(0, 0, 512, 512);       
 	dynamicTexture.update();
@@ -75,7 +74,6 @@ ground2.position.y = 0.05;
 function getColorIndicesForCoord(x, y, width) {
 	var color = y * (width * 4) + x * 4;
 	var colorIndices = [color, color + 1, color + 2, color + 3];
-console.log(x, y, color)
 	var redIndex = colorIndices[0];
 	var greenIndex = colorIndices[1];
 	var blueIndex = colorIndices[2];
@@ -84,7 +82,7 @@ console.log(x, y, color)
 	var redForCoord = imageData.data[redIndex];
 	var greenForCoord = imageData.data[greenIndex];
 	var blueForCoord = imageData.data[blueIndex];
-console.log([redForCoord, greenForCoord, blueForCoord].toString())
+//console.log([redForCoord, greenForCoord, blueForCoord].toString())
 	return [redForCoord, greenForCoord, blueForCoord].toString()
 }
 
@@ -103,8 +101,7 @@ sectionTextures[section5] = new BABYLON.Texture("https://i.imgur.com/h9k0gM4.png
 var section6 = [236, 89, 221].toString();
 sectionTextures[section6] = new BABYLON.Texture("https://i.imgur.com/UBsCpdI.png", scene);
 
-textureForSection.diffuseTexture = sectionTextures[section1];
-console.log("T1",textureForSection.diffuseTexture)   
+textureForSection.diffuseTexture = sectionTextures[section1];  
 textureForSection.diffuseTexture.hasAlpha = true;
 ground2.material = textureForSection;
  
@@ -115,7 +112,6 @@ var colorString = "";
 scene.onPointerMove = function (evt) {
 		var pickResult = scene.pick(scene.pointerX, scene.pointerY);
 		if (pickResult.hit && imgLoaded) {
-			console.log(pickResult.pickedMesh.name, pickResult.pickedPoint);
 			x = Math.floor(512 * pickResult.pickedPoint.x / 5 + 256);  //512 image width, 5 ground width
 			y = Math.floor(-512 * pickResult.pickedPoint.z / 5 + 256);
 			colorString = getColorIndicesForCoord(x, y, 512);
