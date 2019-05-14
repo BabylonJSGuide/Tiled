@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
-    <title>boxes</title>
+    <title>map sections</title>
 
 	<script src="babylon.max.js"></script>
 	<script src="babylon.gui.max.js"></script>
@@ -64,11 +64,11 @@ img.addEventListener('load', function() {
 img.src = 'allsections.jpg'; // Set source path
 
 // Add and manipulate meshes in the scene
-var ground = BABYLON.MeshBuilder.CreateGroundFromHeightMap("gdhm", "https://i.imgur.com/LW12uEN.jpg", {width:5, height :5, subdivisions: 40, maxHeight: 0.1}, scene);
+var ground = BABYLON.MeshBuilder.CreateGroundFromHeightMap("gdhm", "https://i.imgur.com/LW12uEN.jpg", {width:5, height :5, subdivisions: 40, maxHeight: 0.5}, scene);
 ground.material = new BABYLON.StandardMaterial("", scene);
 
 
-var ground2 = BABYLON.MeshBuilder.CreateGroundFromHeightMap("gdhm2", "https://i.imgur.com/LW12uEN.jpg", {width:5, height :5, subdivisions: 40, maxHeight: 0.1}, scene);
+var ground2 = BABYLON.MeshBuilder.CreateGroundFromHeightMap("gdhm2", "https://i.imgur.com/LW12uEN.jpg", {width:5, height :5, subdivisions: 40, maxHeight: 0.5}, scene);
 ground2.position.y = 0.05;
 
 function getColorIndicesForCoord(x, y, width) {
