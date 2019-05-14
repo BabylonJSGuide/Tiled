@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <title>boxes</title>
+
+	<script src="babylon.max.js"></script>
+	<script src="babylon.gui.max.js"></script>
+	
+	
+    <style>
+        html, body {
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #renderCanvas {
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="renderCanvas"></canvas>
+    <script>
+if (BABYLON.Engine.isSupported()) {
+    var canvas = document.getElementById("renderCanvas");
+    var engine = new BABYLON.Engine(canvas, true);
+
+	var createScene = function () {
+
+// Create the scene space
+var scene = new BABYLON.Scene(engine);
+
+// Add a camera to the scene and attach it to the canvas
+var camera = new BABYLON.ArcRotateCamera("Camera", -Math.PI / 2, Math.PI / 4, 8, BABYLON.Vector3.Zero(), scene);
+camera.attachControl(canvas, true);
+
+// Add lights to the scene
+var light1 = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(1, 1, 0), scene);
+//var light2 = new BABYLON.PointLight("light2", new BABYLON.Vector3(0, 1, -1), scene);
+
+
+//console.log(context);   
+var imgData;
+var dynamicTexture;
+var context;
+var imgLoaded = false;
+var img = new Image();   // Create new img element
+img.addEventListener('load', function() {
+	dynamicTexture = new BABYLON.DynamicTexture("all-sections", 512, scene);
+	context = dynamicTexture.getContext();
+console.log("here", img);        
+	context.drawImage(img, 0, 0, 512, 512);
+	imageData = context.getImageData(0, 0, 512, 512);       
+	dynamicTexture.update();
+	ground.material.diffuseTexture = dynamicTexture;
+	imgLoaded = true;
+}, false);
+img.src = 'allsections.jpg'; // Set source path
+
+// Add and manipulate meshes in the scene
+var ground = BABYLON.MeshBuilder.CreateGroundFromHeightMap("gdhm", "https://i.imgur.com/LW12uEN.jpg", {width:5, height :5, subdivisions: 40, maxHeight: 0.1}, scene);
+ground.material = new BABYLON.StandardMaterial("", scene);
+
+
+var ground2 = BABYLON.MeshBuilder.CreateGroundFromHeightMap("gdhm2", "https://i.imgur.com/LW12uEN.jpg", {width:5, height :5, subdivisions: 40, maxHeight: 0.1}, scene);
+ground2.position.y = 0.05;
+
+function getColorIndicesForCoord(x, y, width) {
+	var color = y * (width * 4) + x * 4;
+	var colorIndices = [color, color + 1, color + 2, color + 3];
+console.log(x, y, color)
+	var redIndex = colorIndices[0];
+	var greenIndex = colorIndices[1];
+	var blueIndex = colorIndices[2];
+	var alphaIndex = colorIndices[3];
+
+	var redForCoord = imageData.data[redIndex];
+	var greenForCoord = imageData.data[greenIndex];
+	var blueForCoord = imageData.data[blueIndex];
+console.log([redForCoord, greenForCoord, blueForCoord].toString())
+	return [redForCoord, greenForCoord, blueForCoord].toString()
+}
+
+var textureForSection = new BABYLON.StandardMaterial("sect", scene);
+var sectionTextures = {};
+var section1 = [228, 36, 95].toString();
+sectionTextures[section1] = new BABYLON.Texture("https://i.imgur.com/AaqqCvT.png", scene);
+var section2 = [40, 48, 195].toString();
+sectionTextures[section2] = new BABYLON.Texture("https://i.imgur.com/rCdrQDq.png", scene);
+var section3 = [79, 195, 32].toString();
+sectionTextures[section3] = new BABYLON.Texture("https://i.imgur.com/S7CsHXt.png", scene);
+var section4 = [34, 42, 153].toString();
+sectionTextures[section4] = new BABYLON.Texture("https://i.imgur.com/toSzZuo.png", scene);
+var section5 = [217, 29, 28].toString();
+sectionTextures[section5] = new BABYLON.Texture("https://i.imgur.com/h9k0gM4.png", scene);
+var section6 = [236, 89, 221].toString();
+sectionTextures[section6] = new BABYLON.Texture("https://i.imgur.com/UBsCpdI.png", scene);
+
+textureForSection.diffuseTexture = sectionTextures[section1];
+console.log("T1",textureForSection.diffuseTexture)   
+textureForSection.diffuseTexture.hasAlpha = true;
+ground2.material = textureForSection;
+ 
+
+
+var x, y;
+var colorString = "";
+scene.onPointerMove = function (evt) {
+		var pickResult = scene.pick(scene.pointerX, scene.pointerY);
+		if (pickResult.hit && imgLoaded) {
+			console.log(pickResult.pickedMesh.name, pickResult.pickedPoint);
+			x = Math.floor(512 * pickResult.pickedPoint.x / 5 + 256);  //512 image width, 5 ground width
+			y = Math.floor(-512 * pickResult.pickedPoint.z / 5 + 256);
+			colorString = getColorIndicesForCoord(x, y, 512);
+			if (sectionTextures[colorString]) {
+				textureForSection.diffuseTexture = sectionTextures[colorString];
+				textureForSection.diffuseTexture.hasAlpha = true;
+			}
+
+		}
+};
+
+
+
+
+return scene;
+
+};
+
+
+var scene = createScene();
+
+engine.runRenderLoop(function () {
+  scene.render();
+
+});
+
+window.addEventListener("resize", function () {
+    engine.resize();
+});
+        }
+    </script>
+</body>
+</html>
